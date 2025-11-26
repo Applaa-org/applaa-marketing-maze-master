@@ -1,15 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://l7w1x6y3z4abc"]
+[gd_scene load_steps=2 format=3 uid="uid://l7w1x6y3z4abc"]
 
 [ext_resource type="Script" path="res://scripts/DefeatScreen.gd" id="1"]
-[ext_resource type="Theme" path="res://assets/ui_theme.theme" id="2"]
-[ext_resource type="FontFile" path="res://assets/game_font.ttf" id
-
-<applaa-write path="godot-project/scenes/DefeatScreen.tscn" description="Defeat screen when hitting ad fatigue traps">
-[gd_scene load_steps=4 format=3 uid="uid://l7w1x6y3z4abc"]
-
-[ext_resource type="Script" path="res://scripts/DefeatScreen.gd" id="1"]
-[ext_resource type="Theme" path="res://assets/ui_theme.theme" id="2"]
-[ext_resource type="FontFile" path="res://assets/game_font.ttf" id="3"]
 
 [node name="DefeatScreen" type="Control"]
 layout_mode = 3
@@ -36,43 +27,36 @@ offset_left = -250.0
 offset_top = -200.0
 offset_right = 250.0
 offset_bottom = 200.0
-theme = ExtResource("2")
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 42
 text = "Ad Fatigue Overload!"
-theme_override_fonts/font = ExtResource("3")
 horizontal_alignment = 1
 
 [node name="ScoreLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "Score: 0 Insights"
-theme_override_fonts/font = ExtResource("3")
 horizontal_alignment = 1
 
 [node name="MessageLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "You've been overwhelmed by ad fatigue! The consumer brain rejected your marketing approach."
-theme_override_fonts/font = ExtResource("3")
 horizontal_alignment = 1
 
 [node name="RestartButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Restart Level"
-theme_override_fonts/font = ExtResource("3")
 
 [node name="MenuButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Main Menu"
-theme_override_fonts/font = ExtResource("3")
 
 [node name="CloseButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Close Game"
-theme_override_fonts/font = ExtResource("3")

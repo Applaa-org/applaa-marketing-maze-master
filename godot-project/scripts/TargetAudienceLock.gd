@@ -7,7 +7,14 @@ extends StaticBody2D
 var is_locked: bool = true
 
 func _ready() -> void:
-	sprite.modulate = Color.ORANGE
+	# Create a simple orange rectangle as lock sprite
+	if not sprite.texture:
+		var texture = ImageTexture.new()
+		var image = Image.create(50, 80, false, Image.FORMAT_RGB8)
+		image.fill(Color.ORANGE)
+		texture.set_image(image)
+		sprite.texture = texture
+	
 	label.text = "Target Audience\nNeed Key"
 	body_entered.connect(_on_body_entered)
 

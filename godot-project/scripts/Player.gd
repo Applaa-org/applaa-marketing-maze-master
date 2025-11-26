@@ -7,8 +7,13 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 
 func _ready() -> void:
-	# Set up player appearance
-	sprite.modulate = Color.CYAN
+	# Create a simple colored rectangle as player sprite
+	if not sprite.texture:
+		var texture = ImageTexture.new()
+		var image = Image.create(30, 30, false, Image.FORMAT_RGB8)
+		image.fill(Color.CYAN)
+		texture.set_image(image)
+		sprite.texture = texture
 
 func _physics_process(delta: float) -> void:
 	# Apply gravity (for potential vertical sections)

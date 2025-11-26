@@ -7,11 +7,14 @@ extends Node2D
 
 func _ready() -> void:
 	# Set up UI
-	score_label.text = "Insights: %d" % Global.score
-	keys_label.text = "Keys: %d" % Global.behavior_keys
-	instructions_label.text = "WASD: Move | Space: Jump | Collect insights, avoid red traps!"
+	update_ui()
 
 func _process(delta: float) -> void:
 	# Update UI
-	score_label.text = "Insights: %d" % Global.score
-	keys_label.text = "Keys: %d" % Global.behavior_keys
+	update_ui()
+
+func update_ui() -> void:
+	if score_label:
+		score_label.text = "Insights: %d" % Global.score
+	if keys_label:
+		keys_label.text = "Keys: %d" % Global.behavior_keys
