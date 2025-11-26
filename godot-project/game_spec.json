@@ -1,0 +1,70 @@
+{
+  "game": {
+    "name": "Marketing Maze Master",
+    "type": "2D",
+    "genre": "puzzle maze",
+    "description": "A maze-style logic game set inside a giant brain-shaped labyrinth representing consumer psychology. Players collect customer insights, avoid 'Ad Fatigue Traps,' unlock 'Behavior Keys,' and solve puzzle gates like 'A/B Test Doors' and 'Target Audience Locks.'"
+  },
+  "settings": {
+    "window": {"width": 800, "height": 600},
+    "physics": {"gravity": 980}
+  },
+  "player": {
+    "name": "Marketing Navigator",
+    "health": 1,
+    "speed": 150,
+    "abilities": ["move", "jump", "collect", "unlock"]
+  },
+  "entities": {
+    "collectibles": [
+      {
+        "name": "Customer Insight",
+        "value": 25,
+        "color": "green",
+        "behavior": "floating"
+      }
+    ],
+    "hazards": [
+      {
+        "name": "Ad Fatigue Trap",
+        "damage": 1,
+        "color": "red",
+        "behavior": "pulsing"
+      }
+    ],
+    "keys": [
+      {
+        "name": "Behavior Key",
+        "color": "gold",
+        "behavior": "spinning"
+      }
+    ],
+    "doors": [
+      {
+        "name": "A/B Test Door",
+        "color": "purple",
+        "requires": "key"
+      },
+      {
+        "name": "Target Audience Lock",
+        "color": "orange",
+        "requires": "key"
+      }
+    ]
+  },
+  "levels": [
+    {
+      "name": "Consumer Psychology Maze",
+      "background": "brain-shaped",
+      "obstacles": ["walls", "traps", "locked_doors"]
+    }
+  ],
+  "logic": {
+    "winCondition": "reach_goal",
+    "loseCondition": "hit_trap",
+    "scoring": {
+      "pointsPerInsight": 25,
+      "keysRequired": 2
+    }
+  }
+}

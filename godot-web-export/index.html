@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Maze Master - HTML5 Preview</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: white;
+        }
+        
+        #gameContainer {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(100, 100, 255, 0.3);
+        }
+        
+        #gameCanvas {
+            border: 3px solid #4a4a8a;
+            border-radius: 10px;
+            background: #2a2a4a;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        #instructions {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .button {
+            background: linear-gradient(45deg, #4a4a8a, #6a6aaa);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .button:hover {
+            background: linear-gradient(45deg, #6a6aaa, #8a8aca);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div class="title">Marketing Maze Master</div>
+        <div id="ui">
+            <div>Insights: <span id="score">0</span></div>
+            <div>Keys: <span id="keys">0</span></div>
+        </div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="instructions">
+            WASD/Arrows: Move | Space: Jump | Collect green insights, avoid red traps, find gold keys!
+        </div>
+        <div id="gameButtons" style="margin-top: 15px;">
+            <button class="button" onclick="startGame()">Start Game</button>
+            <button class="button" onclick="resetGame()">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Game state
+        let gameState = 'menu';
+        let score = 0;
+        let keys = 0;
+        let player = {
+            x: 50,
+            y: 50,
+            vx: 0,
+            vy: 0,
+            width: 30,
+            height: 30,
+            speed: 5,
+            jumpPower: 12,
+            onGround: false
+        };
+        
+        // Game objects
+        let insights = [];
+        let traps = [];
+        let behaviorKeys = [];
+        let doors = [];
+        let walls = [];
+        let goal = { x: 700, y: 500, radius: 30 };
+        
+        // Input handling
+        const keys_pressed = {};
+        
+        document.addEventListener('keydown', (e) => {
+            keys_pressed[e.key.toLowerCase()] = true;
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys_pressed[e.key.toLowerCase()] = false;
+        });
+        
+        // Initialize game objects
+        function initGame() {
+            // Reset game state
+            score = 0;
+            keys = 0;
+            player.x = 50;
+            player.y = 50;
+            player.vx = 0;
+            player.vy = 0;
+            
+            // Create walls (simple maze layout)
+            walls = [
+                // Outer walls
+                { x: 0, y: 0, width: 800, height: 20 },
+                { x: 0, y: 580, width: 800, height: 20 },
+                { x: 0, y: 0, width: 20, height: 600 },
+                { x: 780, y: 0, width: 20, height: 600 },
+                // Maze walls
+                { x: 200, y: 150, width: 200, height: 20 },
+                { x: 500, y: 300, width: 200, height: 20 },
+                { x: 150, y: 300, width: 20, height: 200 },
+                { x: 400, y: 200, width: 20, height: 150 }
+            ];
+            
+            // Create customer insights
+            insights = [
+                { x: 150, y: 100, radius: 15, collected: false },
+                { x: 400, y: 150, radius: 15, collected: false },
+                { x: 250, y: 300, radius: 15, collected: false },
+                { x: 650, y: 200, radius: 15, collected: false },
+                { x: 550, y: 500, radius: 15, collected: false }
+            ];
+            
+            // Create ad fatigue traps
+            traps = [
+                { x: 300, y: 100, width: 40, height: 40, pulse: 0 },
+                { x: 500, y: 350, width: 40, height: 40, pulse: 0 },
+                { x: 700, y: 300, width: 40, height: 40, pulse: 0 }
+            ];
+            
+            // Create behavior keys
+            behaviorKeys = [
+                { x: 100, y: 400, radius: 12, collected: false, rotation: 0 },
+                { x: 450, y: 300, radius: 12, collected: false, rotation: 0 }
+            ];
+            
+            // Create doors
+            doors = [
+                { x: 350, y: 250, width: 50, height: 80, locked: true, type: 'AB Test' },
+                { x: 550, y: 350, width: 50, height: 80, locked: true, type: 'Target' }
+            ];
+        }
+        
+        // Update game logic
+        function update() {
+            if (gameState !== 'playing') return;
+            
+            // Handle input
+            if (keys_pressed['a'] || keys_pressed['arrowleft']) {
+                player.vx = -player.speed;
+            } else if (keys_pressed['d'] || keys_pressed['arrowright']) {
+                player.vx = player.speed;
+            } else {
+                player.vx *= 0.8; // Friction
+            }
+            
+            if ((keys_pressed['w'] || keys_pressed['arrowup'] || keys_pressed[' ']) && player.onGround) {
+                player.vy = -player.jumpPower;
+            }
+            
+            // Apply gravity
+            player.vy += 0.5;
+            
+            // Update position
+            player.x += player.vx;
+            player.y += player.vy;
+            
+            // Check wall collisions
+            player.onGround = false;
+            for (let wall of walls) {
+                if (checkCollision(player, wall)) {
+                    // Simple collision resolution
+                    if (player.vy > 0 && player.y < wall.y) {
+                        player.y = wall.y - player.height;
+                        player.vy = 0;
+                        player.onGround = true;
+                    } else if (player.vy < 0 && player.y > wall.y) {
+                        player.y = wall.y + wall.height;
+                        player.vy = 0;
+                    } else if (player.vx > 0 && player.x < wall.x) {
+                        player.x = wall.x - player.width;
+                        player.vx = 0;
+                    } else if (player.vx < 0 && player.x > wall.x) {
+                        player.x = wall.x + wall.width;
+                        player.vx = 0;
+                    }
+                }
+            }
+            
+            // Keep player in bounds
+            if (player.x < 20) player.x = 20;
+            if (player.x > 750) player.x = 750;
+            if (player.y < 20) player.y = 20;
+            if (player.y > 550) {
+                player.y = 550;
+                player.vy = 0;
+                player.onGround = true;
+            }
+            
+            // Check insight collection
+            for (let insight of insights) {
+                if (!insight.collected && checkCircleCollision(player, insight)) {
+                    insight.collected = true;
+                    score += 25;
+                    updateUI();
+                }
+            }
+            
+            // Check trap collision
+            for (let trap of traps) {
+                trap.pulse += 0.1;
+                if (checkCollision(player, trap)) {
+                    gameState = 'defeat';
+                    showDefeatScreen();
+                }
+            }
+            
+            // Check key collection
+            for (let key of behaviorKeys) {
+                if (!key.collected && checkCircleCollision(player, key)) {
+                    key.collected = true;
+                    keys++;
+                    updateUI();
+                }
+                key.rotation += 0.05;
+            }
+            
+            // Check door interaction
+            for (let door of doors) {
+                if (door.locked && checkCollision(player, door)) {
+                    if (keys > 0) {
+                        door.locked = false;
+                        keys--;
+                        updateUI();
+                    }
+                }
+            }
+            
+            // Check goal reached
+            if (checkCircleCollision(player, goal)) {
+                gameState = 'victory';
+                showVictoryScreen();
+            }
+        }
+        
+        // Render game
+        function render() {
+            // Clear canvas
+            ctx.fillStyle = '#2a2a4a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            if (gameState === 'menu') {
+                renderMenu();
+                return;
+            }
+            
+            if (gameState === 'victory') {
+                renderVictory();
+                return;
+            }
+            
+            if (gameState === 'defeat') {
+                renderDefeat();
+                return;
+            }
+            
+            // Draw walls
+            ctx.fillStyle = '#4a4a8a';
+            for (let wall of walls) {
+                ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+            }
+            
+            // Draw insights
+            for (let insight of insights) {
+                if (!insight.collected) {
+                    ctx.fillStyle = '#00ff00';
+                    ctx.beginPath();
+                    ctx.arc(insight.x, insight.y + Math.sin(Date.now() * 0.002) * 5, insight.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            // Draw traps
+            for (let trap of traps) {
+                const alpha = 0.5 + Math.sin(trap.pulse) * 0.5;
+                ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`;
+                ctx.fillRect(trap.x, trap.y, trap.width, trap.height);
+            }
+            
+            // Draw behavior keys
+            for (let key of behaviorKeys) {
+                if (!key.collected) {
+                    ctx.save();
+                    ctx.translate(key.x, key.y);
+                    ctx.rotate(key.rotation);
+                    ctx.fillStyle = '#ffd700';
+                    ctx.fillRect(-10, -10, 20, 20);
+                    ctx.restore();
+                }
+            }
+            
+            // Draw doors
+            for (let door of doors) {
+                ctx.fillStyle = door.locked ? '#8b008b' : '#008800';
+                ctx.fillRect(door.x, door.y, door.width, door.height);
+                ctx.fillStyle = 'white';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(door.type, door.x + door.width/2, door.y + door.height/2);
+            }
+            
+            // Draw goal
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(goal.x, goal.y, goal.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'black';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('GOAL', goal.x, goal.y);
+            
+            // Draw player
+            ctx.fillStyle = '#00ffff';
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
+        
+        function renderMenu() {
+            ctx.fillStyle = 'white';
+            ctx.font = '48px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Marketing Maze Master', canvas.width/2, 200);
+            
+            ctx.font = '20px Arial';
+            ctx.fillText('Navigate the brain-shaped maze of consumer psychology!', canvas.width/2, 280);
+            ctx.fillText('Collect green insights, avoid red traps, find gold keys!', canvas.width/2, 320);
+            ctx.fillText('Reach the white goal to achieve Marketing Mastery!', canvas.width/2, 360);
+            
+            ctx.font = '24px Arial';
+            ctx.fillText('Click "Start Game" to begin', canvas.width/2, 450);
+        }
+        
+        function renderVictory() {
+            ctx.fillStyle = '#00ff00';
+            ctx.font = '48px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Marketing Mastery Achieved!', canvas.width/2, 200);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = '32px Arial';
+            ctx.fillText(`Final Score: ${score} Insights`, canvas.width/2, 300);
+            
+            ctx.font = '20px Arial';
+            ctx.fillText('You successfully navigated the consumer psychology maze!', canvas.width/2, 380);
+        }
+        
+        function renderDefeat() {
+            ctx.fillStyle = '#ff0000';
+            ctx.font = '48px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Ad Fatigue Overload!', canvas.width/2, 200);
+            
+            ctx.fillStyle = 'white';
+            ctx.font = '32px Arial';
+            ctx.fillText(`Score: ${score} Insights`, canvas.width/2, 300);
+            
+            ctx.font = '20px Arial';
+            ctx.fillText('The consumer brain rejected your marketing approach!', canvas.width/2, 380);
+        }
+        
+        // Collision detection
+        function checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+        
+        function checkCircleCollision(rect, circle) {
+            const distX = Math.abs(circle.x - rect.x - rect.width/2);
+            const distY = Math.abs(circle.y - rect.y - rect.height/2);
+            
+            if (distX > (rect.width/2 + circle.radius)) return false;
+            if (distY > (rect.height/2 + circle.radius)) return false;
+            
+            if (distX <= rect.width/2) return true;
+            if (distY <= rect.height/2) return true;
+            
+            const dx = distX - rect.width/2;
+            const dy = distY - rect.height/2;
+            return (dx*dx + dy*dy <= circle.radius*circle.radius);
+        }
+        
+        // UI functions
+        function updateUI() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('keys').textContent = keys;
+        }
+        
+        function startGame() {
+            gameState = 'playing';
+            initGame();
+            updateUI();
+        }
+        
+        function resetGame() {
+            gameState = 'menu';
+            initGame();
+            updateUI();
+        }
+        
+        function showVictoryScreen() {
+            // Victory is handled in render
+        }
+        
+        function showDefeatScreen() {
+            // Defeat is handled in render
+        }
+        
+        // Game loop
+        function gameLoop() {
+            update();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Start the game
+        initGame();
+        updateUI();
+        gameLoop();
+    </script>
+</body>
+</html>

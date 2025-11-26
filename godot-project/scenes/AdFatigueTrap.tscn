@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://d9o3p5q7r8stu"]
+
+[ext_resource type="Script" path="res://scripts/AdFatigueTrap.gd" id="1"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(40, 40)
+
+[node name="AdFatigueTrap" type="Area2D"]
+script = ExtResource("1")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 0, 0, 1)
+scale = Vector2(0.6, 0.6)
+texture = preload("res://assets/trap_icon.png")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1")
