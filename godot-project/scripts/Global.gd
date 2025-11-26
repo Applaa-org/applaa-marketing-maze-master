@@ -8,3 +8,4 @@ func add_score(points: int) -> void:
 
 func reset_score() -> void:
 	score = 0
+	behavior_keys = 0

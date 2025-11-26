@@ -5,12 +5,13 @@ extends Area2D
 
 func _ready() -> void:
 	# Create a simple gold square as key sprite
-	if not sprite.texture:
-		var texture = ImageTexture.new()
-		var image = Image.create(24, 24, false, Image.FORMAT_RGB8)
-		image.fill(Color.GOLD)
-		texture.set_image(image)
-		sprite.texture = texture
+	if sprite:
+		if not sprite.texture:
+			var texture = ImageTexture.new()
+			var image = Image.create(24, 24, false, Image.FORMAT_RGB8)
+			image.fill(Color.GOLD)
+			texture.set_image(image)
+			sprite.texture = texture
 	
 	body_entered.connect(_on_body_entered)
 	
@@ -21,5 +22,6 @@ func _ready() -> void:
 
 func _on_body_entered(body: Node) -> void:
 	if body.name == "Player":
-		Global.behavior_keys += 1
+		if Global:
+			Global.behavior_keys += 1
 		queue_free()

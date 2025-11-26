@@ -107,8 +107,6 @@
             vy: 0,
             width: 30,
             height: 30,
-            speed:
-
             speed: 5,
             jumpPower: 12,
             onGround: false
@@ -256,7 +254,6 @@
                 trap.pulse += 0.1;
                 if (checkCollision(player, trap)) {
                     gameState = 'defeat';
-                    showDefeatScreen();
                 }
             }
             
@@ -284,7 +281,6 @@
             // Check goal reached
             if (checkCircleCollision(player, goal)) {
                 gameState = 'victory';
-                showVictoryScreen();
             }
         }
         
@@ -396,6 +392,7 @@
             
             ctx.font = '20px Arial';
             ctx.fillText('You successfully navigated the consumer psychology maze!', canvas.width/2, 380);
+            ctx.fillText('Click "Reset" to play again', canvas.width/2, 420);
         }
         
         function renderDefeat() {
@@ -410,6 +407,7 @@
             
             ctx.font = '20px Arial';
             ctx.fillText('The consumer brain rejected your marketing approach!', canvas.width/2, 380);
+            ctx.fillText('Click "Reset" to try again', canvas.width/2, 420);
         }
         
         // Collision detection
@@ -451,14 +449,6 @@
             gameState = 'menu';
             initGame();
             updateUI();
-        }
-        
-        function showVictoryScreen() {
-            // Victory is handled in render
-        }
-        
-        function showDefeatScreen() {
-            // Defeat is handled in render
         }
         
         // Game loop

@@ -5,18 +5,19 @@ extends Area2D
 
 func _ready() -> void:
 	# Create a simple green circle as insight sprite
-	if not sprite.texture:
-		var texture = ImageTexture.new()
-		var image = Image.create(30, 30, false, Image.FORMAT_RGBA8)
-		image.fill(Color.TRANSPARENT)
-		# Draw a green circle
-		for x in range(30):
-			for y in range(30):
-				var dist = Vector2(x - 15, y - 15).length()
-				if dist <= 15:
-					image.set_pixel(x, y, Color.GREEN)
-		texture.set_image(image)
-		sprite.texture = texture
+	if sprite:
+		if not sprite.texture:
+			var texture = ImageTexture.new()
+			var image = Image.create(30, 30, false, Image.FORMAT_RGBA8)
+			image.fill(Color.TRANSPARENT)
+			# Draw a green circle
+			for x in range(30):
+				for y in range(30):
+					var dist = Vector2(x - 15, y - 15).length()
+					if dist <= 15:
+						image.set_pixel(x, y, Color.GREEN)
+			texture.set_image(image)
+			sprite.texture = texture
 	
 	body_entered.connect(_on_body_entered)
 	
@@ -28,5 +29,6 @@ func _ready() -> void:
 
 func _on_body_entered(body: Node) -> void:
 	if body.name == "Player":
-		body.collect_insight()
+		if body.has_method("collect_insight"):
+			body.collect_insight()
 		queue_free()

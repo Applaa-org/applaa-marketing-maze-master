@@ -14,18 +14,19 @@ func _ready() -> void:
 	message_label.text = "You've successfully navigated the consumer psychology maze and mastered the art of marketing!"
 	
 	# Connect buttons
-	restart_button.pressed.connect(_on_restart_pressed)
-	menu_button.pressed.connect(_on_menu_pressed)
-	close_button.pressed.connect(_on_close_pressed)
+	if restart_button:
+		restart_button.pressed.connect(_on_restart_pressed)
+	if menu_button:
+		menu_button.pressed.connect(_on_menu_pressed)
+	if close_button:
+		close_button.pressed.connect(_on_close_pressed)
 
 func _on_restart_pressed() -> void:
 	Global.reset_score()
-	Global.behavior_keys = 0
 	get_tree().change_scene_to_file("res://scenes/Main.tscn")
 
 func _on_menu_pressed() -> void:
 	Global.reset_score()
-	Global.behavior_keys = 0
 	get_tree().change_scene_to_file("res://scenes/StartScreen.tscn")
 
 func _on_close_pressed() -> void:

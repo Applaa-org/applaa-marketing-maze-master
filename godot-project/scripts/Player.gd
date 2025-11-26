@@ -8,12 +8,13 @@ var gravity: float = ProjectSettings.get_setting("physics/2d/default_gravity")
 
 func _ready() -> void:
 	# Create a simple colored rectangle as player sprite
-	if not sprite.texture:
-		var texture = ImageTexture.new()
-		var image = Image.create(30, 30, false, Image.FORMAT_RGB8)
-		image.fill(Color.CYAN)
-		texture.set_image(image)
-		sprite.texture = texture
+	if sprite:
+		if not sprite.texture:
+			var texture = ImageTexture.new()
+			var image = Image.create(30, 30, false, Image.FORMAT_RGB8)
+			image.fill(Color.CYAN)
+			texture.set_image(image)
+			sprite.texture = texture
 
 func _physics_process(delta: float) -> void:
 	# Apply gravity (for potential vertical sections)
@@ -34,11 +35,13 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 func collect_insight() -> void:
-	Global.add_score(25)
+	if Global:
+		Global.add_score(25)
 	# Visual feedback
-	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color.YELLOW, 0.2)
-	tween.tween_property(sprite, "modulate", Color.CYAN, 0.2)
+	if sprite:
+		var tween = create_tween()
+		tween.tween_property(sprite, "modulate", Color.YELLOW, 0.2)
+		tween.tween_property(sprite, "modulate", Color.CYAN, 0.2)
 
 func hit_ad_fatigue() -> void:
 	# Player hit an ad fatigue trap

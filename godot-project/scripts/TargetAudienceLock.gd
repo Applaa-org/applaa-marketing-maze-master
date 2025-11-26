@@ -8,25 +8,30 @@ var is_locked: bool = true
 
 func _ready() -> void:
 	# Create a simple orange rectangle as lock sprite
-	if not sprite.texture:
-		var texture = ImageTexture.new()
-		var image = Image.create(50, 80, false, Image.FORMAT_RGB8)
-		image.fill(Color.ORANGE)
-		texture.set_image(image)
-		sprite.texture = texture
+	if sprite:
+		if not sprite.texture:
+			var texture = ImageTexture.new()
+			var image = Image.create(50, 80, false, Image.FORMAT_RGB8)
+			image.fill(Color.ORANGE)
+			texture.set_image(image)
+			sprite.texture = texture
 	
-	label.text = "Target Audience\nNeed Key"
+	if label:
+		label.text = "Target Audience\nNeed Key"
 	body_entered.connect(_on_body_entered)
 
 func _on_body_entered(body: Node) -> void:
 	if body.name == "Player" and is_locked:
-		if Global.behavior_keys > 0:
+		if Global and Global.behavior_keys > 0:
 			# Unlock the door
 			Global.behavior_keys -= 1
 			is_locked = false
-			sprite.modulate = Color.GREEN
-			label.text = "Target Audience\nUnlocked!"
-			collision_shape.set_deferred("disabled", true)
+			if sprite:
+				sprite.modulate = Color.GREEN
+			if label:
+				label.text = "Target Audience\nUnlocked!"
+			if collision_shape:
+				collision_shape.set_deferred("disabled", true)
 			
 			# Remove after delay
 			await get_tree().create_timer(1.0).timeout

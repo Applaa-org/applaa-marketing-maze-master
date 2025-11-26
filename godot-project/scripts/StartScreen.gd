@@ -30,12 +30,13 @@ TIPS:
 	"""
 	
 	# Connect buttons
-	start_button.pressed.connect(_on_start_pressed)
-	close_button.pressed.connect(_on_close_pressed)
+	if start_button:
+		start_button.pressed.connect(_on_start_pressed)
+	if close_button:
+		close_button.pressed.connect(_on_close_pressed)
 
 func _on_start_pressed() -> void:
 	Global.reset_score()
-	Global.behavior_keys = 0
 	get_tree().change_scene_to_file("res://scenes/Main.tscn")
 
 func _on_close_pressed() -> void:
